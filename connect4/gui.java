@@ -31,6 +31,8 @@ public class gui {
     private boolean quit = false;
     private boolean newGame = false;
     //making of grid and logic
+    private int lastx=-1;
+    private int lasty=-1;
     Grid my_grid = new Grid();
     logic my_logic = new logic(my_grid); //create game logic
 
@@ -40,6 +42,8 @@ public class gui {
     	clips = new Environment();
         clips.load("c4.clp");
         clips.assertString("(dim  (x 7) (y 6))");
+        System.out.println(" fatti iniziali");
+
         System.out.println(clips.eval("(facts)"));
         //clips.reset();
 
@@ -60,6 +64,8 @@ public class gui {
                         public void actionPerformed(ActionEvent e) {
                             int a = Integer.parseInt(e.getActionCommand());
                             int y = my_grid.find_y(a);//check for space in collumn
+                            lastx=a;
+                            lasty=y;
                             if (y != -1) {
                                 //sets a place to current player
                                 if (my_logic.set_and_check(a, y, currentPlayer)) {
@@ -107,8 +113,7 @@ public class gui {
     			buttons[i].setEnabled(false);
     		}
     		
-    		//int a=(int)(Math.random()*7);
-    		int a=decisionMaking(2,3);
+    		int a=decisionMaking(lastx,lasty);
 			
 			 int y = my_grid.find_y(a);//check for space in collumn
 	         if (y != -1) {
@@ -183,34 +188,40 @@ public class gui {
     public int decisionMaking(int userChoise,int userY){
 
 		//System.out.println(clips.eval("(agenda)").toString());
-	    String userMove = "(G1 "+userChoise+" "+userY+" )";
+	   
+    	String userMove = "(G1 "+userChoise+" "+userY+" )";
 	
-		clips.assertString(userMove);	  
-		clips.run();	  
+		clips.assertString(userMove);	
+		System.out.println(clips.eval("(agenda)"));
+
+		clips.run(1);	  
 
 		
 	    PrimitiveValue pv = (PrimitiveValue) clips.eval("(get-all-facts-by-names next-move)");
 	    
 
-
-	    
-	    
     	String clipsResponse =pv.toString();
-    	String n =clipsResponse.substring(7,8);
-		
+    	//String n = clipsResponse.split("(<")[1].split(">)")[1].split("-")[1];
     	
-		//String clipsResponse =
+		String a=clipsResponse.replaceAll(">", "");
+		String n=a.substring(0, a.length()-1).split("-")[1];
+		
+		System.out.print("a : "+a);
 
-		System.out.println("move : ");
+		System.out.print("move : ");
 
 		
 		String action=(clips.eval("(fact-slot-value "+n+" move)")).toString();
 		System.out.println(clips.eval("(fact-slot-value "+n+" move)"));
+		
 
-		clips.clear();
-		clips.load("c4.clp");
-        clips.assertString("(dim  (x 7) (y 6))");
-        System.out.println(clips.eval("(facts)"));
+
+        clips.load("c4.clp");
+        
+        clips.eval("(retract "+n+" )");
+        System.out.println(" fatti dopo mossa");
+
+		System.out.println(clips.eval("(facts)"));
 		
 	
 		return Integer.valueOf(action);
