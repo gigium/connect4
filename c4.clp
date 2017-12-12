@@ -21,4 +21,3 @@
 
 (defrule dumb-defense (G1 ?x ?y) => (assert (next-move(move ?x))))
   
- fufjftufyv
