@@ -19,6 +19,4 @@
 
 (defrule random (dim (x ?x) (y ?y))=> (assert (next-move (move (random 0 (- ?x 1))))))
 
-
-  
- 
+(defrule dumb-defense (G1 ?x ?y) => (assert(next-move(move ?y))))
